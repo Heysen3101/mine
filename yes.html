@@ -458,13 +458,14 @@ function startMusic(){
     }).catch(()=>{});
 }
 
-let musicUnlocked = false;
+// Autoplay immediately if user came from index "Yes" click
+if (sessionStorage.getItem("allowYesMusic") === "1") {
+    startMusic();
+}
 
-document.body.addEventListener("click", ()=>{
-    if(!musicUnlocked){
-        musicUnlocked = true;
-        startMusic();
-    }
+// Fallback: if someone opens yes.html directly on mobile, first tap will start
+document.body.addEventListener("click", () => {
+    if (music.paused) startMusic();
 });
 
 

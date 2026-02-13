@@ -240,7 +240,9 @@ function yesClicked() {
   setTimeout(() => {
     clearInterval(lightningInterval);
     clearInterval(balloonInterval);
+    sessionStorage.setItem("allowYesMusic", "1");
     window.location.href = "yes.html";
+
   }, 3500);
 }
 
