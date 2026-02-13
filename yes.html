@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>My Valentine ❤️</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
@@ -11,10 +11,11 @@
 /* ================= BASE ================= */
 body {
   margin: 0;
-  height: 100vh;
+  min-height: 100svh; /* FIX mobile height */
   background: radial-gradient(circle at top, #3a0d16, #120406 70%);
   font-family: "Montserrat", sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
   color: #f8e6ea;
 }
 
@@ -24,6 +25,7 @@ body {
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  pointer-events: none; /* performance */
 }
 
 .circle {
@@ -31,6 +33,7 @@ body {
   border-radius: 50%;
   background: rgba(255, 192, 203, 0.12);
   animation: floatUp linear infinite;
+  will-change: transform;
 }
 
 .reg-heart {
@@ -40,6 +43,7 @@ body {
   background: #b3122f;
   transform: rotate(45deg);
   animation: floatUp linear infinite;
+  will-change: transform;
 }
 
 .reg-heart:before,
@@ -65,6 +69,7 @@ body {
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
+  will-change: transform;
 }
 
 .face-heart img {
@@ -88,6 +93,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 /* ================= HEADINGS ================= */
@@ -103,7 +109,7 @@ body {
 
 .heading .line1,
 .heading .line2 {
-  font-size: 36px;
+  font-size: clamp(22px, 6vw, 36px);
   font-weight: 700;
   opacity: 0;
   transform: translateY(-30px);
@@ -120,7 +126,7 @@ body {
   position: absolute;
   top: 6%;
   font-family: "Playfair Display", serif;
-  font-size: 42px;
+  font-size: clamp(24px, 7vw, 42px);
   text-align: center;
   width: 100%;
   opacity: 0;
@@ -132,12 +138,11 @@ body {
 /* ================= SCENE ================= */
 .scene {
   position: relative;
-  width: 340px;
-  height: 510px;
-  max-width: 90vw;
+  width: min(340px, 90vw);
+  aspect-ratio: 2 / 3; /* keeps 340x510 ratio */
+  max-height: 80svh; /* prevents cutoff */
   perspective: 1200px;
 }
-
 
 /* FLASH */
 .flash {
@@ -206,10 +211,10 @@ body {
   align-items: center;
   justify-content: center;
   font-family: "Playfair Display", serif;
-  font-size: 18px;
+  font-size: clamp(14px, 3.5vw, 18px);
   text-align: center;
   color: white;
-  padding: 15px;
+  padding: clamp(10px, 3vw, 15px);
   overflow: hidden;
   cursor: pointer;
   transition: background 0.6s ease, transform 0.6s ease;
@@ -276,11 +281,11 @@ body {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 14px 36px;
+  padding: clamp(10px, 3vw, 14px) clamp(24px, 6vw, 36px);
   border-radius: 30px;
   border: none;
   font-weight: 600;
-  font-size: 16px;
+  font-size: clamp(14px, 4vw, 16px);
   cursor: pointer;
   background: linear-gradient(120deg, #ff4b6e, #ff758c);
   color: white;
@@ -292,6 +297,7 @@ body {
   opacity: 0;
   pointer-events: none;
 }
+
 /* 3D FLIP */
 .flip-container {
   width: 100%;
@@ -315,7 +321,6 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Text fade */
 .crack-tile span {
   transition: opacity 0.5s ease;
 }
@@ -329,7 +334,7 @@ body {
 <body>
 
 <div class="bg-layer" id="bgLayer"></div>
-<audio id="bgMusic" src="us.mp3" preload="auto" loop></audio>
+<audio id="bgMusic" src="us.mp3" preload="auto" loop playsinline></audio>
 
 <div class="wrapper" id="app">
 
@@ -345,7 +350,6 @@ body {
   <div class="scene">
     <div class="flip-container">
 
-      <!-- FRONT (COLLAGE SIDE) -->
       <div class="front">
 
         <div class="flash" id="flash"></div>
@@ -372,19 +376,19 @@ body {
 
       </div>
 
-      <!-- BACK (CLEAN ORIGINAL IMAGE) -->
       <div class="back">
         <div class="photo">
           <img src="ourphoto.jpg">
         </div>
       </div>
 
-    </div> <!-- flip-container -->
-  </div> <!-- scene -->
+    </div>
+  </div>
 
-</div> <!-- wrapper -->
+</div>
 
 <script>
+
 /* ================= FLOATING BACKGROUND ================= */
 
 const bgLayer = document.getElementById("bgLayer");
@@ -414,14 +418,13 @@ function createFloatingElement(type){
 
   if(type === "face-heart"){
       const img = document.createElement("img");
-      img.src = "herface.jpg";   // your face image
+      img.src = "herface.jpg";
       el.appendChild(img);
   }
 
   bgLayer.appendChild(el);
 }
 
-/* Create floating elements */
 for(let i=0; i<10; i++) createFloatingElement("circle");
 for(let i=0; i<12; i++) createFloatingElement("reg-heart");
 for(let i=0; i<6; i++) createFloatingElement("face-heart");
@@ -444,10 +447,16 @@ function startMusic(){
             if(v<0.6){v+=0.05; music.volume=v;}
             else clearInterval(fade);
         },200);
-    });
+    }).catch(()=>{});
 }
 
+/* Mobile safe autoplay */
+document.body.addEventListener("click", ()=>{
+    if(music.paused) startMusic();
+},{ once:true });
+
 /* TILE SETUP */
+
 const romanticLines = [
   "You are my favorite forever.",
   "With you, every moment feels magical.",
@@ -497,7 +506,6 @@ crackTiles.forEach((tile,index)=>{
 
 });
 
-/* MERGE */
 function mergeTiles(){
 
     setTimeout(()=>{
@@ -517,15 +525,12 @@ function mergeTiles(){
     },800);
 }
 
-/* FLIP */
 scene.addEventListener("click", function(){
     if(revealedCount < 6) return;
     scene.classList.toggle("flipped");
 });
 
-/* OPEN CARD (UNCHANGED LOGIC) */
 function openCard(){
-
 
     document.getElementById("app").classList.add("open");
     document.getElementById("openBtn").classList.add("fade-out");
@@ -558,10 +563,6 @@ function openCard(){
 
     },1700);
 }
-/* AUTO START MUSIC WHEN PAGE LOADS */
-window.addEventListener("load", () => {
-    startMusic();
-});
 
 </script>
 
