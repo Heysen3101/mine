@@ -304,8 +304,11 @@ body {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d; /* MOBILE FIX */
   transition: transform 1s ease;
+  will-change: transform;
 }
+
 
 .scene.flipped .flip-container {
   transform: rotateY(180deg);
@@ -315,11 +318,16 @@ body {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;  /* MOBILE FIX */
+  transform-style: preserve-3d;
 }
+
 
 .back {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* MOBILE FIX */
 }
+
 
 .crack-tile span {
   transition: opacity 0.5s ease;
@@ -450,10 +458,15 @@ function startMusic(){
     }).catch(()=>{});
 }
 
-/* Mobile safe autoplay */
+let musicUnlocked = false;
+
 document.body.addEventListener("click", ()=>{
-    if(music.paused) startMusic();
-},{ once:true });
+    if(!musicUnlocked){
+        musicUnlocked = true;
+        startMusic();
+    }
+});
+
 
 /* TILE SETUP */
 
